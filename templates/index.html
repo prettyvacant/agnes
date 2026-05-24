@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agnes — Arte Feminista & Queer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+    <div class="app">
+
+        <!-- Sidebar: Artista del Día -->
+        <aside class="sidebar">
+            <div class="logo">
+                <span class="logo-symbol">✦</span>
+                <span class="logo-text">agnes</span>
+            </div>
+
+            <div class="artist-card">
+                <div class="artist-day-label">artista del día</div>
+                <h2 class="artist-name">{{ artist.name }}</h2>
+                <div class="artist-meta">{{ artist.years }} &middot; {{ artist.nacionalidad }}</div>
+
+                <div class="artist-movements">
+                    {% for m in artist.movimientos %}
+                    <span class="tag">{{ m }}</span>
+                    {% endfor %}
+                </div>
+
+                <p class="artist-description">{{ artist.descripcion }}</p>
+
+                <div class="artist-works">
+                    <div class="works-label">obras destacadas</div>
+                    <ul>
+                        {% for obra in artist.obras_destacadas %}
+                        <li>{{ obra }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <div class="artist-themes">
+                    {% for tema in artist.temas %}
+                    <span class="theme-tag">{{ tema }}</span>
+                    {% endfor %}
+                </div>
+
+                <button class="learn-more-btn" onclick="askAboutArtist('{{ artist.name }}')">
+                    Pregunta sobre {{ artist.name }} →
+                </button>
+            </div>
+
+            <div class="sidebar-footer">
+                arte feminista · queer · interseccional
+            </div>
+        </aside>
+
+        <!-- Chat -->
+        <main class="chat-area">
+            <div class="chat-header">
+                <div class="chat-title">Habla con Agnes</div>
+                <button class="reset-btn" onclick="resetChat()">Nueva conversación</button>
+            </div>
+
+            <div class="messages" id="messages">
+                <div class="message assistant">
+                    <div class="message-content" id="welcome-msg"></div>
+                </div>
+            </div>
+
+            <div class="input-area">
+                <textarea
+                    id="input"
+                    placeholder="¿Qué quieres explorar hoy?"
+                    rows="1"
+                    onkeydown="handleKey(event)"
+                    oninput="autoResize(this)"
+                ></textarea>
+                <button id="send-btn" onclick="sendMessage()" aria-label="Enviar">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M2 21L23 12 2 3v7l15 2-15 2v7z"/>
+                    </svg>
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const ARTIST_NAME = {{ artist.name | tojson }};
+    </script>
+    <script src="/static/script.js"></script>
+</body>
+</html>
