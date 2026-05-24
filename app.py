@@ -2,7 +2,8 @@ import os
 import json
 import hashlib
 import datetime
-from flask import Flask, render_template, request, Response
+from flask import Flask, render_template, request, Response, jsonify
+from flask_cors import CORS
 from anthropic import Anthropic
 from artists import ARTISTS
 from dotenv import load_dotenv
@@ -10,6 +11,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = Flask(__name__)
+CORS(app)
 client = Anthropic()
 
 
@@ -85,6 +87,35 @@ def chat():
         mimetype="text/event-stream",
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )
+
+
+@app.route("/api/artist", methods=["GET"])
+def artist_of_day():
+    return jsonify(get_artist_of_the_day())
+
+
+@app.route("/api/chat/simple", methods=["POST"])
+def chat_simple():
+    data = request.get_json()
+    messages = data.get("messages", [])
+
+    artist = get_artist_of_the_day()
+    system_prompt = build_system_prompt(artist)
+
+    response = client.messages.create(
+        model=os.getenv("CLAUDE_MODEL", "claude-opus-4-7"),
+        max_tokens=1500,
+        system=[
+            {
+                "type": "text",
+                "text": system_prompt,
+                "cache_control": {"type": "ephemeral"},
+            }
+        ],
+        messages=messages[-20:],
+    )
+
+    return jsonify({"response": response.content[0].text})
 
 
 if __name__ == "__main__":
